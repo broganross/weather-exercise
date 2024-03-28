@@ -17,6 +17,8 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+var Version = "development"
+
 func main() {
 	// Load config from env vars
 	conf := config.Config{}

@@ -98,8 +98,6 @@ func (h *Handlers) GetCurrentByCoords(w http.ResponseWriter, r *http.Request) {
 		)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 // Creates and writes an error

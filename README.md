@@ -40,6 +40,14 @@ The required
 ## Build and Run
 Use standard go build and run commands with `cmd/server/main.go`
 
+## Docker
+If you want to run this in a container, make an environment variable file with the required ones.  Then build and run:
+```
+> docker build --tag "weather-exercise" .
+> docker run -p 8080:80 --env-file /path/to/env/file "weather-exercise"
+```
+Then connect on port 8080.
+
 ## NOTES
 
 * We are making the assumption that responses are in JSON.
