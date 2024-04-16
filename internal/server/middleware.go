@@ -50,7 +50,7 @@ func (am *Auth) Middleware(next http.Handler) http.Handler {
 			} else if !authorized {
 				err = errors.New("user not authorized")
 			}
-			EncodeError(
+			encodeError(
 				r.Context(),
 				w,
 				http.StatusUnauthorized,

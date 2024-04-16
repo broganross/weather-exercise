@@ -49,29 +49,29 @@ func (h *Handlers) GetCurrentByCoords(w http.ResponseWriter, r *http.Request) {
 	var lon float64
 	latString := q.Get("latitude")
 	if latString == "" {
-		EncodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: latitude", ErrMissingParam), "")
+		encodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: latitude", ErrMissingParam), "")
 		return
 	}
 	lat, err := strconv.ParseFloat(latString, 32)
 	if err != nil {
-		EncodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: latitude", ErrInvalidFloat), "")
+		encodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: latitude", ErrInvalidFloat), "")
 		return
 	}
 	lonString := q.Get("longitude")
 	if lonString == "" {
-		EncodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: longitude", ErrMissingParam), "")
+		encodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: longitude", ErrMissingParam), "")
 		return
 	}
 	lon, err = strconv.ParseFloat(lonString, 32)
 	if err != nil {
-		EncodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: longitude", ErrInvalidFloat), "")
+		encodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: longitude", ErrInvalidFloat), "")
 		return
 	}
 
 	// business logic
-	weather, err := h.Domain.CurrentIn(r.Context(), float32(lat), float32(lon))
+	weather, err := h.Domain.CurrentIn(ctx, float32(lat), float32(lon))
 	if err != nil {
-		EncodeError(
+		encodeError(
 			ctx,
 			w,
 			http.StatusInternalServerError,
@@ -89,7 +89,7 @@ func (h *Handlers) GetCurrentByCoords(w http.ResponseWriter, r *http.Request) {
 		Longitude:   preciseFloat32(lon),
 	}
 	if err := json.NewEncoder(w).Encode(&resp); err != nil {
-		EncodeError(
+		encodeError(
 			ctx,
 			w,
 			http.StatusInternalServerError,
@@ -101,15 +101,15 @@ func (h *Handlers) GetCurrentByCoords(w http.ResponseWriter, r *http.Request) {
 }
 
 // Creates and writes an error
-func EncodeError(ctx context.Context, w http.ResponseWriter, code int, err error, mess string) {
+func encodeError(ctx context.Context, w http.ResponseWriter, statusCode int, err error, message string) {
 	l := log.Ctx(ctx)
 	item := errorResponse{
 		Error:   err.Error(),
-		Message: mess,
-		Status:  code,
+		Message: message,
+		Status:  statusCode,
 	}
 	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(code)
+	w.WriteHeader(statusCode)
 	if err := json.NewEncoder(w).Encode(&item); err != nil {
 		b := []byte(fmt.Sprintf(`{"status":500,"error":"error encoding error response: %s}`, err))
 		if _, err := w.Write(b); err != nil {
@@ -117,5 +117,5 @@ func EncodeError(ctx context.Context, w http.ResponseWriter, code int, err error
 			return
 		}
 	}
-	l.Error().Err(err).Int("status_code", code).Send()
+	l.Err(err).Int("status_code", statusCode).Send()
 }

@@ -23,7 +23,7 @@ func main() {
 	// Load config from env vars
 	conf := config.Config{}
 	if err := envconfig.Process("weather", &conf); err != nil {
-		log.Error().Err(err).Msg("parsing environment variables")
+		log.Err(err).Msg("parsing environment variables")
 		os.Exit(1)
 	}
 	zerolog.SetGlobalLevel(conf.LogLevel)
@@ -53,7 +53,7 @@ func main() {
 	}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
-			log.Error().Err(err).Msg("serving")
+			log.Err(err).Msg("serving")
 		}
 	}()
 
@@ -66,6 +66,5 @@ func main() {
 	defer cancel()
 	srv.Shutdown(ctx)
 	log.Info().Msg("shutting down")
-	os.Exit(1)
-
+	os.Exit(0)
 }

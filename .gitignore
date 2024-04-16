@@ -22,3 +22,4 @@ go.work
 
 # Visual Studio
 .vscode/
+.env
