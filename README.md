@@ -35,7 +35,6 @@ Configuration is handled purely with environment variables:
 | WEATHER_OPENWEATHER_TIMEOUT | No | Client timeout for Open Weather connections | 5s |
 | WEATHER_AUTHSERVICE_URL | No | Auth service URL | http://some.auth.com |
 
-The required 
 
 ## Build and Run
 Use standard go build and run commands with `cmd/server/main.go`

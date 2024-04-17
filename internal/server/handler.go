@@ -30,14 +30,9 @@ func SetupRoutes(h *Handlers, r *mux.Router, c *config.Config) {
 	r.HandleFunc("/", h.GetCurrentByCoords).Methods(http.MethodGet)
 }
 
-// Business logic interface
-type WeatherDomain interface {
-	CurrentIn(ctx context.Context, lat float32, lon float32) (*domain.Weather, error)
-}
-
 // Our handlers for whatever routes we need
 type Handlers struct {
-	Domain WeatherDomain
+	Domain domain.Service
 }
 
 func (h *Handlers) GetCurrentByCoords(w http.ResponseWriter, r *http.Request) {

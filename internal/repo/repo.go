@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/broganross/weather-exercise/internal/domain"
 	"github.com/broganross/weather-exercise/internal/types"
 )
 
@@ -42,7 +43,7 @@ type OpenWeather struct {
 }
 
 // GetByCoords retrieves current weather data for a set of coordinates
-func (ow *OpenWeather) GetByCoords(ctx context.Context, lat float32, lon float32) (*Weather, error) {
+func (ow *OpenWeather) GetByCoords(ctx context.Context, lat float32, lon float32) (*domain.RepoWeather, error) {
 	u := fmt.Sprintf("%s/weather", ow.BaseURL)
 	ctx, cancel := context.WithTimeout(ctx, ow.Timeout)
 	defer cancel()
@@ -74,30 +75,17 @@ func (ow *OpenWeather) GetByCoords(ctx context.Context, lat float32, lon float32
 	if err := json.NewDecoder(resp.Body).Decode(&item); err != nil {
 		return nil, fmt.Errorf("decoding current weather response body: %w", err)
 	}
-	states := make([]WeatherState, len(item.Weather))
+	states := make([]string, len(item.Weather))
 	for index, w := range item.Weather {
-		states[index] = WeatherState{
-			ID:          w.ID,
-			Name:        w.Main,
-			Description: w.Description,
-		}
+		states[index] = w.Main
 	}
-	w := &Weather{
+	w := &domain.RepoWeather{
 		Coords: types.Coords{
 			Latitude:  item.Coord.Lat,
 			Longitude: item.Coord.Lon,
 		},
-		States: states,
-		Temperature: Temperature{
-			Temp:        item.Main.Temp,
-			FeelsLike:   item.Main.FeelsLike,
-			Min:         item.Main.Min,
-			Max:         item.Main.Max,
-			Pressure:    item.Main.Pressure,
-			Humidity:    item.Main.Humidity,
-			SeaLevel:    item.Main.SeaLevel,
-			GroundLevel: item.Main.GroundLevel,
-		},
+		States:      states,
+		Temperature: item.Main.Temp,
 	}
 	return w, nil
 }

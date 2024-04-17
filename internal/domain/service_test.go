@@ -14,29 +14,16 @@ import (
 
 var errNotFound = errors.New("response not found")
 
-var (
-	rainState = repo.WeatherState{
-		ID:          1,
-		Name:        "rain",
-		Description: "wetness falls from the sky",
-	}
-	hailState = repo.WeatherState{
-		ID:          2,
-		Name:        "hail",
-		Description: "hard wetness falls from the sky",
-	}
-)
-
 type mockWeatherRepoResponse struct {
 	err  error
-	resp *repo.Weather
+	resp *domain.RepoWeather
 }
 
 type mockWeatherRepo struct {
 	responses map[string]mockWeatherRepoResponse
 }
 
-func (mwr *mockWeatherRepo) GetByCoords(ctx context.Context, lat float32, lon float32) (*repo.Weather, error) {
+func (mwr *mockWeatherRepo) GetByCoords(ctx context.Context, lat float32, lon float32) (*domain.RepoWeather, error) {
 	s := fmt.Sprintf("%.04f:%.04f", lat, lon)
 	i, ok := mwr.responses[s]
 	if !ok {
@@ -46,6 +33,16 @@ func (mwr *mockWeatherRepo) GetByCoords(ctx context.Context, lat float32, lon fl
 }
 
 func TestWeatherService_CurrentIn(t *testing.T) {
+	rainState := repo.WeatherState{
+		ID:          1,
+		Name:        "rain",
+		Description: "wetness falls from the sky",
+	}
+	hailState := repo.WeatherState{
+		ID:          2,
+		Name:        "hail",
+		Description: "hard wetness falls from the sky",
+	}
 	tests := []struct {
 		name string
 		lat  float32
@@ -71,18 +68,16 @@ func TestWeatherService_CurrentIn(t *testing.T) {
 				responses: map[string]mockWeatherRepoResponse{
 					"10.1000:32.1000": {
 						err: nil,
-						resp: &repo.Weather{
+						resp: &domain.RepoWeather{
 							Coords: types.Coords{
 								Latitude:  10.1,
 								Longitude: 32.1,
 							},
-							States: []repo.WeatherState{
-								rainState,
-								hailState,
+							States: []string{
+								rainState.Name,
+								hailState.Name,
 							},
-							Temperature: repo.Temperature{
-								Temp: 39.99,
-							},
+							Temperature: 39.99,
 						},
 					},
 				},

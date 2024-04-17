@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/broganross/weather-exercise/internal/domain"
 	"github.com/broganross/weather-exercise/internal/repo"
 	"github.com/broganross/weather-exercise/internal/types"
 )
@@ -66,26 +67,13 @@ func TestOpenWeather_GetByCoords(t *testing.T) {
 			  }`))
 		}))
 	defer server.Close()
-	want := &repo.Weather{
+	want := &domain.RepoWeather{
 		Coords: types.Coords{
 			Latitude:  10.1,
 			Longitude: 22.2,
 		},
-		States: []repo.WeatherState{{
-			ID:          501,
-			Name:        "Rain",
-			Description: "moderate rain",
-		}},
-		Temperature: repo.Temperature{
-			Temp:        298.48,
-			FeelsLike:   298.74,
-			Min:         297.56,
-			Max:         300.05,
-			Pressure:    1015,
-			Humidity:    64,
-			SeaLevel:    1015,
-			GroundLevel: 933,
-		},
+		States:      []string{"Rain"},
+		Temperature: 298.48,
 	}
 	ow := repo.OpenWeather{
 		BaseURL: server.URL,
