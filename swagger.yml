@@ -1,0 +1,70 @@
+openapi: '3.0.2'
+info:
+  title: Current Weather
+  version: '1.0'
+servers:
+  - url: https://api.server.test/v1
+paths:
+  /:
+    get:
+      summary: Get current weather
+      parameters:
+        - name: latitude
+          in: query
+          description: Latitude of position to get weather conditions
+          required: true
+          schema:
+            type: number
+            format: float
+            example: 200.11
+        - name: longitude
+          in: query
+          required: true
+          description: Longitude of position to get weather conditions
+          schema:
+            type: number
+            format: float
+            example: 40.51
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: urn
+                    example: "urn:weather:current:id"
+                  type: #
+                    type: string
+                    format: urn
+                    enum:
+                      - "urn:weather:current"
+                  attributes:
+                    type: object
+                    properties:
+                      latitude:
+                        type: number
+                        format: float
+                        example: 200.11
+                      longitude:
+                        type: number
+                        format: float
+                        example: 40.51
+                      temperature:
+                        type: string
+                        enum:
+                          - unknown
+                          - hot
+                          - cold
+                          - moderate
+                        example: moderate
+                      condition:
+                        type: string
+                        example: cloudy, foggy
+                  links:
+                    type: object
+
+

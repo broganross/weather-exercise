@@ -6,7 +6,7 @@ Write an http server that uses the Open Weather API that exposes an endpoint tha
 The API can be found here:https://openweathermap.org/api. Even though most of the API calls found on OpenWeather aren’t free, you should be able to use the free “current weather data” API call for this project.  First, sign-up for an account, which shouldn’t require credit card or payment information.  Once you’ve created an account, use https://openweathermap.org/faq to get your API Key setup to start using the API.
 
 ## Implementation
-This is broken into three basic parts: http server (server/), domain layer (domain/), and weather service (repo).
+This is broken into three basic parts: http server (server/), domain layer (domain/), and weather service (repo/).
 
 ### HTTP Server
 Very basic setup.  It only has the single route.  If this service was meant to be RESTful, obviously we would organize the single route into an appropriate path.

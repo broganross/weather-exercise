@@ -3,32 +3,7 @@ package domain
 import (
 	"context"
 	"fmt"
-
-	"github.com/broganross/weather-exercise/internal/types"
 )
-
-type Temperature string
-
-const (
-	TempUnknown Temperature = "unknown"
-	TempHot     Temperature = "hot"
-	TempCold    Temperature = "cold"
-	TempMod     Temperature = "moderate"
-)
-
-type Weather struct {
-	Coords      types.Coords
-	States      []string
-	Temperature Temperature
-}
-
-// RepoWeather purely existing so that WeatherService.CurrentIn actually does something.
-// In a normal case we would convert the repo data into domain data.  AKA join states, and convert the temperature.
-type RepoWeather struct {
-	Coords      types.Coords
-	States      []string
-	Temperature float32
-}
 
 // Exported Business logic interface
 type Service interface {
@@ -63,7 +38,7 @@ func (w *WeatherService) CurrentIn(ctx context.Context, lat float32, lon float32
 	}
 
 	s := &Weather{
-		Coords: types.Coords{
+		Coords: Coords{
 			Latitude:  cw.Coords.Latitude,
 			Longitude: cw.Coords.Longitude,
 		},

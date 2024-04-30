@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/broganross/weather-exercise/internal/config"
-	"github.com/broganross/weather-exercise/internal/domain"
+	"github.com/broganross/weather-exercise/config"
+	"github.com/broganross/weather-exercise/domain"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 )
@@ -78,10 +78,14 @@ func (h *Handlers) GetCurrentByCoords(w http.ResponseWriter, r *http.Request) {
 	// remap structure to API
 	cond := strings.Join(weather.States, ", ")
 	resp := getCurrentByCoordsResponse{
-		Temperature: string(weather.Temperature),
-		Condition:   cond,
-		Latitude:    preciseFloat32(lat),
-		Longitude:   preciseFloat32(lon),
+		ID:   "urn:weather:current:id",
+		Type: "urn:weather:current",
+		Attribtues: currentAttributes{
+			Temperature: string(weather.Temperature),
+			Condition:   cond,
+			Latitude:    preciseFloat32(lat),
+			Longitude:   preciseFloat32(lon),
+		},
 	}
 	if err := json.NewEncoder(w).Encode(&resp); err != nil {
 		encodeError(

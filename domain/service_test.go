@@ -7,9 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/broganross/weather-exercise/internal/domain"
-	"github.com/broganross/weather-exercise/internal/repo"
-	"github.com/broganross/weather-exercise/internal/types"
+	"github.com/broganross/weather-exercise/domain"
+	"github.com/broganross/weather-exercise/repo"
 )
 
 var errNotFound = errors.New("response not found")
@@ -56,7 +55,7 @@ func TestWeatherService_CurrentIn(t *testing.T) {
 			10.1,
 			32.1,
 			&domain.Weather{
-				Coords: types.Coords{
+				Coords: domain.Coords{
 					Latitude:  10.1,
 					Longitude: 32.1,
 				},
@@ -69,7 +68,7 @@ func TestWeatherService_CurrentIn(t *testing.T) {
 					"10.1000:32.1000": {
 						err: nil,
 						resp: &domain.RepoWeather{
-							Coords: types.Coords{
+							Coords: domain.Coords{
 								Latitude:  10.1,
 								Longitude: 32.1,
 							},

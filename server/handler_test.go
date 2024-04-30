@@ -10,9 +10,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/broganross/weather-exercise/internal/domain"
-	"github.com/broganross/weather-exercise/internal/server"
-	"github.com/broganross/weather-exercise/internal/types"
+	"github.com/broganross/weather-exercise/domain"
+	"github.com/broganross/weather-exercise/server"
 )
 
 var errResponseNotFound = errors.New("response not found")
@@ -41,7 +40,7 @@ func TestWeatherSource_GetCurrentIn(t *testing.T) {
 			responses: map[string]mockWeatherDomainResponse{
 				"1.20:2.30": {
 					weather: domain.Weather{
-						Coords: types.Coords{
+						Coords: domain.Coords{
 							Latitude:  1.2,
 							Longitude: 2.3,
 						},

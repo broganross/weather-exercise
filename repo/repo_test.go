@@ -8,9 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/broganross/weather-exercise/internal/domain"
-	"github.com/broganross/weather-exercise/internal/repo"
-	"github.com/broganross/weather-exercise/internal/types"
+	"github.com/broganross/weather-exercise/domain"
+	"github.com/broganross/weather-exercise/repo"
 )
 
 func TestOpenWeather_GetByCoords(t *testing.T) {
@@ -68,7 +67,7 @@ func TestOpenWeather_GetByCoords(t *testing.T) {
 		}))
 	defer server.Close()
 	want := &domain.RepoWeather{
-		Coords: types.Coords{
+		Coords: domain.Coords{
 			Latitude:  10.1,
 			Longitude: 22.2,
 		},

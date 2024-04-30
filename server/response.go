@@ -15,8 +15,16 @@ func (pf *preciseFloat32) MarshalJSON() ([]byte, error) {
 	return []byte(strconv.FormatFloat(float64(*pf), 'f', 6, 32)), nil
 }
 
-// NOTE: this should be extended with some standard response attribtues
 type getCurrentByCoordsResponse struct {
+	ID         string `json:"id"`
+	Type       string `json:"type"`
+	Attribtues currentAttributes
+	// Links      apiLinks
+	// Relationships apiRelationships
+	// meta apiMeta
+}
+
+type currentAttributes struct {
 	Latitude    preciseFloat32 `json:"latitude"`
 	Longitude   preciseFloat32 `json:"longitude"`
 	Temperature string         `json:"temperature"`

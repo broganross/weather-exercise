@@ -8,8 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/broganross/weather-exercise/internal/domain"
-	"github.com/broganross/weather-exercise/internal/types"
+	"github.com/broganross/weather-exercise/domain"
 )
 
 type WeatherState struct {
@@ -18,7 +17,7 @@ type WeatherState struct {
 	Description string
 }
 
-type Temperature struct {
+type temperature struct {
 	Temp        float32
 	FeelsLike   float32
 	Min         float32
@@ -30,9 +29,9 @@ type Temperature struct {
 }
 
 type Weather struct {
-	Coords      types.Coords
+	Coords      domain.Coords
 	States      []WeatherState
-	Temperature Temperature
+	Temperature temperature
 }
 
 type OpenWeather struct {
@@ -79,8 +78,9 @@ func (ow *OpenWeather) GetByCoords(ctx context.Context, lat float32, lon float32
 	for index, w := range item.Weather {
 		states[index] = w.Main
 	}
+	// this only exists because the domain only converts states, and temperature.
 	w := &domain.RepoWeather{
-		Coords: types.Coords{
+		Coords: domain.Coords{
 			Latitude:  item.Coord.Lat,
 			Longitude: item.Coord.Lon,
 		},
