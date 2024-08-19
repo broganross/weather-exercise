@@ -3,7 +3,11 @@ package server
 import "strconv"
 
 type errorResponse struct {
-	Status  int    `json:"status"`
+	Errors []errorItem `json:"errors"`
+	Status int         `json:"status"`
+}
+
+type errorItem struct {
 	Error   string `json:"error"`
 	Message string `json:"message,omitempty"`
 }
@@ -16,9 +20,9 @@ func (pf *preciseFloat32) MarshalJSON() ([]byte, error) {
 }
 
 type getCurrentByCoordsResponse struct {
-	ID         string `json:"id"`
-	Type       string `json:"type"`
-	Attribtues currentAttributes
+	ID         string            `json:"id"`
+	Type       string            `json:"type"`
+	Attribtues currentAttributes `json:"attributes"`
 	// Links      apiLinks
 	// Relationships apiRelationships
 	// meta apiMeta

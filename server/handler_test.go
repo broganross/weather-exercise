@@ -1,13 +1,13 @@
 package server_test
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/broganross/weather-exercise/domain"
@@ -61,25 +61,19 @@ func TestWeatherSource_GetCurrentIn(t *testing.T) {
 			"happy-path",
 			"?latitude=1.2&longitude=2.3",
 			http.StatusOK,
-			[]byte(`{"latitude":1.200000,"longitude":2.300000,"temperature":"cold","condition":"rain"}`),
+			[]byte("{\"id\":\"urn:weather:current:id\",\"type\":\"urn:weather:current\",\"attributes\":{\"latitude\":1.200000,\"longitude\":2.300000,\"temperature\":\"cold\",\"condition\":\"rain\"}}\n"),
 		},
 		{
-			"missing-latitude",
-			"?longitude=2.3",
+			"missing-parameters",
+			"",
 			http.StatusBadRequest,
-			[]byte(`{"error":"missing query parameter: latitude", "status":400}`),
-		},
-		{
-			"missing-longitude",
-			"?latitude=2.3",
-			http.StatusBadRequest,
-			[]byte(`{"error":"missing query parameter: longitude", "status":400}`),
+			[]byte("{\"errors\":[{\"error\":\"missing query parameter: latitude\",\"message\":\"required query parameters\"},{\"error\":\"missing query parameter: longitude\",\"message\":\"required query parameters\"}],\"status\":400}\n"),
 		},
 		{
 			"domain-failure",
 			"?latitude=1.22&longitude=2.30",
 			http.StatusInternalServerError,
-			[]byte(`{"error":"retrieving current weather: no response found","status":500}`),
+			[]byte("{\"errors\":[{\"error\":\"retrieving current weather: response not found\"}],\"status\":500}\n"),
 		},
 	}
 	for _, test := range tests {
@@ -94,9 +88,17 @@ func TestWeatherSource_GetCurrentIn(t *testing.T) {
 			if h := resp.Header.Get("Content-Type"); h != "application/json" {
 				t.Errorf("expected Content-Type header 'application/json' got '%v'", h)
 			}
-			body, _ := io.ReadAll(resp.Body)
-			if bytes.Equal(test.body, body) {
-				t.Errorf("expected body '%v' got '%v'", test.body, string(body))
+			body, err := io.ReadAll(resp.Body)
+			if err != nil {
+				t.Errorf("reading body: %v", err)
+			}
+			s := string(body)
+			_ = s
+			e := string(test.body)
+			_ = e
+			if !strings.EqualFold(string(test.body), s) {
+				// if !bytes.Equal(test.body, body) {
+				t.Errorf("expected body '%v' got '%v'", string(test.body), s)
 			}
 		})
 	}

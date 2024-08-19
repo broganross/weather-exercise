@@ -13,7 +13,7 @@ import (
 // TODO: extend to log outgoing request statuses
 func LogContextMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		requestID := r.Header.Get("Request-ID")
+		requestID := r.Header.Get("X-Request-ID")
 		if requestID == "" {
 			requestID = uuid.NewString()
 		}
@@ -41,7 +41,7 @@ func (am *Auth) Middleware(next http.Handler) http.Handler {
 		authenticated := true
 		authorized := true
 		// pull an auth token from the header
-		// check it's validity in some repository
+		// check its validity in some repository
 		// check that the user can access the resource
 		if !authenticated || !authorized {
 			var err error
@@ -54,7 +54,7 @@ func (am *Auth) Middleware(next http.Handler) http.Handler {
 				r.Context(),
 				w,
 				http.StatusUnauthorized,
-				err,
+				[]error{err},
 				"",
 			)
 			return
@@ -62,10 +62,3 @@ func (am *Auth) Middleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
-
-// func AuthMiddleware(next http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		log.Debug().Msg("this is where we would be checking authentication and authorization")
-// 		next.ServeHTTP(w, r)
-// 	})
-// }

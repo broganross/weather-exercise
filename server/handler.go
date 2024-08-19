@@ -42,24 +42,27 @@ func (h *Handlers) GetCurrentByCoords(w http.ResponseWriter, r *http.Request) {
 	// get the query parameters
 	var lat float64
 	var lon float64
-	latString := q.Get("latitude")
-	if latString == "" {
-		encodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: latitude", ErrMissingParam), "")
-		return
+	errs := []error{}
+	if latString := q.Get("latitude"); latString != "" {
+		l, err := strconv.ParseFloat(latString, 32)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("%w: latitude", ErrInvalidFloat))
+		}
+		lat = l
+	} else {
+		errs = append(errs, fmt.Errorf("%w: latitude", ErrMissingParam))
 	}
-	lat, err := strconv.ParseFloat(latString, 32)
-	if err != nil {
-		encodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: latitude", ErrInvalidFloat), "")
-		return
+	if lonString := q.Get("longitude"); lonString != "" {
+		l, err := strconv.ParseFloat(lonString, 32)
+		if err != nil {
+			errs = append(errs, fmt.Errorf("%w: longitude", ErrInvalidFloat))
+		}
+		lon = l
+	} else {
+		errs = append(errs, fmt.Errorf("%w: longitude", ErrMissingParam))
 	}
-	lonString := q.Get("longitude")
-	if lonString == "" {
-		encodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: longitude", ErrMissingParam), "")
-		return
-	}
-	lon, err = strconv.ParseFloat(lonString, 32)
-	if err != nil {
-		encodeError(ctx, w, http.StatusBadRequest, fmt.Errorf("%w: longitude", ErrInvalidFloat), "")
+	if len(errs) > 0 {
+		encodeError(ctx, w, http.StatusBadRequest, errs, "required query parameters")
 		return
 	}
 
@@ -70,7 +73,7 @@ func (h *Handlers) GetCurrentByCoords(w http.ResponseWriter, r *http.Request) {
 			ctx,
 			w,
 			http.StatusInternalServerError,
-			fmt.Errorf("retrieving current weather: %w", err),
+			[]error{fmt.Errorf("retrieving current weather: %w", err)},
 			"",
 		)
 		return
@@ -92,7 +95,7 @@ func (h *Handlers) GetCurrentByCoords(w http.ResponseWriter, r *http.Request) {
 			ctx,
 			w,
 			http.StatusInternalServerError,
-			fmt.Errorf("encoding current weather response: %w", err),
+			[]error{fmt.Errorf("encoding current weather response: %w", err)},
 			"",
 		)
 		return
@@ -100,21 +103,26 @@ func (h *Handlers) GetCurrentByCoords(w http.ResponseWriter, r *http.Request) {
 }
 
 // Creates and writes an error
-func encodeError(ctx context.Context, w http.ResponseWriter, statusCode int, err error, message string) {
+func encodeError(ctx context.Context, w http.ResponseWriter, statusCode int, errs []error, message string) {
 	l := log.Ctx(ctx)
-	item := errorResponse{
-		Error:   err.Error(),
-		Message: message,
-		Status:  statusCode,
+	resp := errorResponse{Status: statusCode}
+	event := l.Error()
+	for _, e := range errs {
+		item := errorItem{
+			Error:   e.Error(),
+			Message: message,
+		}
+		resp.Errors = append(resp.Errors, item)
+		event.Err(e)
 	}
+	event.Int("status_code", statusCode).Send()
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
-	if err := json.NewEncoder(w).Encode(&item); err != nil {
+	if err := json.NewEncoder(w).Encode(&resp); err != nil {
 		b := []byte(fmt.Sprintf(`{"status":500,"error":"error encoding error response: %s}`, err))
 		if _, err := w.Write(b); err != nil {
 			l.Error().Err(err).Msg("writing default error to response writer")
 			return
 		}
 	}
-	l.Err(err).Int("status_code", statusCode).Send()
 }
